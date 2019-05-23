@@ -21,9 +21,33 @@ function getElementData(textFile, fileName) {
     //is obtained from elements[] above
     for (let elementType = 0; elementType < elements.length; elementType++) {
         let elemArr = doc.getElementsByTagName(elements[elementType]);
+        console.log(elemArr);
         //For each element we captured, obtain the desired metadata
         for (let i = 0; i < elemArr.length; i++) {
-            let actualFieldName = getName(elemArr[i]);
+            let bindingPropertyName = getBindingPropName(elemArr[i]);
+            let actualFieldName = "";
+            if (elements[elementType] !== 'textarea') {
+                actualFieldName = elemArr[i].parentNode.innerText;
+            } else {
+                elemArr[i].labels.length > 0 ?
+                    actualFieldName = elemArr[i].labels[0].innerText :
+                    actualFieldName = elemArr[i].parentNode.innerText;
+
+                // if (elementType[elementType] === 'textarea') {
+                //     elemArr[i].labels.length === 0 ?
+                //         actualFieldName = elemArr[i].parentNode.innerText :
+                //         actualFieldName = elemArr[i].labels[0].innerText;
+                // } else {
+                //     // if (elemArr[i].parentNode.innerText == " ") {
+                //     //     console.log('here');
+                //     //     actualFieldName = elemArr[i].parentNode.parentNode.parentNode.innerText;
+                //     // } else {
+                //     //     actualFieldName = elemArr[i].parentNode.innerText;
+                //     // }
+                // }
+
+            }
+
             let htmlFileName = fileName.slice(0,
                 fileName.indexOf('component') - 1);
             let min = 'N/A';
@@ -51,7 +75,8 @@ function getElementData(textFile, fileName) {
                 autoCorrect = kendoValues.autoCorrect;
             }
 
-            console.log('FieldName: ' + actualFieldName);
+            console.log("Actual Field Name" + actualFieldName);
+            console.log('BindingPropertyName: ' + bindingPropertyName);
             console.log('inputType: ' + inputType);
             console.log('fileName: ' + htmlFileName);
             console.log('min: ' + min);
@@ -60,7 +85,8 @@ function getElementData(textFile, fileName) {
 
             //Create a JSON object with the collected info
             finalOutput.push({
-                'FieldLabelName': actualFieldName,
+                'ActualFieldName': actualFieldName,
+                'BindingPropertyName': bindingPropertyName,
                 'inputType': inputType,
                 'fileName': htmlFileName,
                 'min': min,
@@ -76,7 +102,7 @@ function getElementData(textFile, fileName) {
  * the [(ngModel)] or [value] bindings.
  * @param elem: element to obtain name for
  */
-function getName(elem) {
+function getBindingPropName(elem) {
     let tempName = "";
 
     if (elem.hasAttribute('[(ngModel)]')) {
@@ -160,5 +186,3 @@ function main() {
     }
     exportToJson(finalOutput, 'test');
 }
-
-
